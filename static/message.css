@@ -1,0 +1,39 @@
+.container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+  }
+  
+  /* Clear floats */
+  .container::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+  /* Style time text */
+  .time-left {
+    float: left;
+    color: #999;
+  }
+  
+  /* Style the username to right */
+  .right {
+    float: right;
+    margin-left: 20px;
+    margin-right:0;
+  }
+
+  /* Style delete button */
+  .delete {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline: none;
+    color: red;
+    display: none;
+  }

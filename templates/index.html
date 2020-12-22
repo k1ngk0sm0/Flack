@@ -1,0 +1,131 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='message.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='chatPopUp.css') }}">
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='channel-form.js') }}"></script>
+<script src="{{ url_for('static', filename='username.js') }}"></script>
+<script src="{{ url_for('static', filename='channel-select.js') }}"></script>
+<script src="{{ url_for('static', filename='channel-default.js') }}"></script>
+<script src="{{ url_for('static', filename='message-add.js') }}"></script>
+<script src="{{ url_for('static', filename='message-delete.js') }}"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+
+<script id="post" type="text/x-handlebars-template">
+    <div class="container message">
+        {% raw -%}
+        <h6 class="right">Posted by: {{ username }}</h6>
+        <p>{{ message }}</p>
+        <span>
+            <p class="time-left">{{ timestamp }}</p>
+            <button class='delete right'>Delete</button>
+        </span>
+        {%- endraw %}
+    </div>
+</script>
+
+<script>
+
+    // Start with first post.
+    let counter = 1;
+
+    // Load posts 20 at a time.
+    const quantity = 20;
+
+    // When DOM loads, render the first 20 posts.
+    document.addEventListener('DOMContentLoaded', load);
+
+    // If scrolled to bottom, load the next 20 posts.
+    window.onscroll = () => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+            load();
+        }
+    };
+
+    // Load next set of posts.
+    function load() {
+
+        // Set start and end post numbers, and update counter.
+        const start = counter;
+        const end = start + quantity - 1;
+        counter = end + 1;
+
+        // Open new request to get new posts.
+        const request = new XMLHttpRequest();
+        request.open('POST', 'messages');
+        request.onload = () => {
+            const data = JSON.parse(request.responseText);
+            data.forEach(add_post);
+        };
+
+        // Add start and end points to request data.
+        const data = new FormData();
+        data.append('start', start);
+        data.append('end', end);
+        data.append('channel', localStorage.getItem('channel'));
+
+        // Send request.
+        request.send(data);
+    };
+
+    // Add a new post with given contents to DOM.
+    const post_template = Handlebars.compile(document.querySelector('#post').innerHTML);
+    function add_post(contents) {
+
+        // Create new post.
+        const post = post_template({'username': contents['username'], 'message': contents['message'], 'timestamp': contents['timestamp']});
+
+        // Add post to DOM.
+        document.querySelector('#messages').innerHTML += post;
+    }
+</script>
+
+
+
+{% endblock %}
+
+{% block title %}
+Main
+{% endblock %}
+
+{% block main %}
+<div class='row no-gutters'>
+    <div id='nav' class='col'>
+        <h1>Flack</h1>
+        <hr>
+        <form id="add-channel" method="POST" action="/new_channel">
+            <input type="text" id='new-channel' autofocus placeholder="New Channel" autocomplete="off" name='channel'>
+            <input type="submit" value='Create' id='channel-submit'>
+        </form>
+        <hr class='hrWhite'>
+        <h6>Channels</h6>
+        <hr class='hrWhite'>
+        {% for channel in channels %}
+            <button data-channel='{{ channel }}' class='channel'>{{ channel }}</button><br>
+        {% endfor %}
+    </div>
+    <div id='messages' class='col'>
+        <h1 id='msgs-head'></h1>
+        <hr>
+
+        <button class="open-button" id="msg-open">Add Message</button>
+
+        <div class="chat-popup" id="myForm">
+        <form  class="form-container">
+
+            <label for="msg"><b>Message</b></label>
+            <textarea placeholder="Type message.." id='msg-body' autofocus required></textarea>
+
+            <button type="button" class="btn" id='msg-send'>Send</button>
+            <button type="button" id='msg-cancel' class="btn cancel">Close</button>
+        </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

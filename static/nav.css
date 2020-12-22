@@ -1,0 +1,35 @@
+#nav {
+    text-align: center;
+    height: 100%;
+    width: 25%;
+    position: fixed;
+    background-color: #111;
+    overflow-x: hidden;
+    color: white;
+}
+
+.channel {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+    color: white;
+}
+
+#msgs-head {
+    text-align: center;
+}
+
+#messages {
+    margin-left: 25%;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.hrWhite {
+    background-color: white;
+    height: 1px;
+    border: 0;
+}
